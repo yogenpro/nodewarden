@@ -54,6 +54,58 @@ const topLevelToml = (key, value) => ({
   },
 });
 
+/**
+ * An `overrides` entry pinned at or above `minimum` and still inside its major.
+ * Both halves are the patch. Below the floor the advisory is simply unfixed;
+ * without the major bound an unbounded `>=` resolves the newest major instead,
+ * which for nanoid is an ESM-only 4.x+ that postcss — its only consumer here,
+ * and a CJS `require('nanoid/non-secure')` caller — never declared support for.
+ * An exact pin at or above the floor passes: upstream writes exact pins, and one
+ * that clears the advisory is not the fault this guards against.
+ */
+const overrideFloorInMajor = (name, minimum) => ({
+  describe: `overrides["${name}"] >= ${minimum}, bounded to ${minimum.split('.')[0]}.x`,
+  check(text) {
+    let manifest;
+    try {
+      manifest = JSON.parse(text);
+    } catch (e) {
+      return `unparseable JSON (${e.message})`;
+    }
+
+    const range = manifest.overrides?.[name];
+    if (typeof range !== 'string') return `no \`overrides["${name}"]\``;
+
+    const m = /^(\^|>=)?(\d+)\.(\d+)\.(\d+)$/.exec(range.trim());
+    if (!m) return `\`overrides["${name}"]\` is \`${range}\`, not a plain \`^\`, \`>=\` or exact version`;
+
+    const want = minimum.split('.').map(Number);
+    const [major, minor, patch] = m.slice(2).map(Number);
+    if (major !== want[0]) {
+      return `\`overrides["${name}"]\` is \`${range}\`, outside ${want[0]}.x — postcss requires ${name} through CJS`;
+    }
+    if (minor < want[1] || (minor === want[1] && patch < want[2])) {
+      return `\`overrides["${name}"]\` is \`${range}\`, below the ${minimum} advisory floor`;
+    }
+    if (m[1] === '>=') {
+      return `\`overrides["${name}"]\` is \`${range}\`: an unbounded \`>=\` resolves the newest major, not ${want[0]}.x`;
+    }
+    return null;
+  },
+});
+
+/** A key that must still be in a JSON manifest — JSON has no comments. */
+const jsonKey = (key) => ({
+  describe: `\`${key}\` key present`,
+  check(text) {
+    try {
+      return key in JSON.parse(text) ? null : `no \`${key}\` key`;
+    } catch (e) {
+      return `unparseable JSON (${e.message})`;
+    }
+  },
+});
+
 const PATCHES = [
   {
     id: 'fork-patch:workers-dev-off',
@@ -62,6 +114,15 @@ const PATCHES = [
     assertions: [
       topLevelToml('workers_dev', 'false'),
       topLevelToml('preview_urls', 'false'),
+    ],
+  },
+  {
+    id: 'fork-patch:nanoid-advisory-floor',
+    summary: 'nanoid stays at or above its 3.3.18 advisory fix, inside 3.x',
+    files: ['package.json'],
+    assertions: [
+      overrideFloorInMajor('nanoid', '3.3.18'),
+      jsonKey('//fork-patch:nanoid-advisory-floor'),
     ],
   },
 ];

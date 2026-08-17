@@ -48,8 +48,9 @@
       }
     }
   },
+  "//fork-patch:nanoid-advisory-floor": "overrides.nanoid must stay ^3.3.18 or later within 3.x: GHSA-2v37-7h3g-55p8 is fixed in 3.3.18, and upstream's exact pin below that blocks the fix. Keep the major bound — postcss requires nanoid via CJS and 4.x+ is ESM-only. See FORK.md.",
   "overrides": {
-    "nanoid": "3.3.17",
+    "nanoid": "^3.3.18",
     "undici": "8.9.0",
     "@babel/core": ">=7.29.6",
     "esbuild": ">=0.28.1",
