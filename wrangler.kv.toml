@@ -2,6 +2,13 @@ name = "nodewarden"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
+# FORK PATCH (see FORK.md — fork-patch:workers-dev-off)
+# Kept identical to wrangler.toml on purpose: this is the alternate storage
+# backend for the same worker name, so a `deploy:kv` run would otherwise
+# re-enable both doors that wrangler.toml closes.
+workers_dev = false
+preview_urls = false
+
 [build]
 command = "npm run build"
 

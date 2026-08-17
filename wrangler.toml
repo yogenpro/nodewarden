@@ -2,6 +2,16 @@ name = "nodewarden"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
+# FORK PATCH (see FORK.md — fork-patch:workers-dev-off)
+# This deployment is reached only at its Workers custom domain. Left unset,
+# wrangler defaults workers_dev to true whenever the config declares no routes —
+# and this one declares none, because the custom domain is attached outside
+# wrangler. That publishes the whole vault at a second hostname, and preview_urls
+# does the same for every uploaded version, keeping superseded builds reachable
+# after a deploy. Both are stated here rather than left to the default.
+workers_dev = false
+preview_urls = false
+
 [build]
 command = "npm run build"
 
