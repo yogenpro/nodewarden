@@ -105,6 +105,16 @@ at by name.
 hostname is Terraform's. Declaring it here too creates two writers of one field:
 whichever ran last wins, and the other's next plan is dirty.
 
+**The Cloudflare dashboard is a read-only view of this worker.** Every setting it
+shows is owned by a file — this repo's wrangler config, or the Terraform root.
+Changing something there does not fail; it just makes the live worker stop
+matching the code that is supposed to describe it, silently and with no diff
+anywhere. This has already happened once: `workers_dev` and `preview_urls` were
+both on in production while nothing in any repo said so, and it took an audit-log
+query to reconstruct why. Deploy with `npm run deploy`; if a setting needs
+changing, change the file and deploy. Use the dashboard to look, and to read the
+audit log when the live state and the files disagree.
+
 ## Things that will bite you
 
 **`npm run deploy:kv` deploys over the same worker.** `wrangler.kv.toml` sets the
