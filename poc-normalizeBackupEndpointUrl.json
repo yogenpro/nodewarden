@@ -1,0 +1,47 @@
+[
+  {
+    "url": "http://127.0.0.1",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://169.254.169.254",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[::1]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[0:0:0:0:0:0:0:1]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[::2]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[::]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[fe80::1]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "http://[fc00::1]",
+    "allowed": false,
+    "error": "WebDAV server URL host is not allowed"
+  },
+  {
+    "url": "https://example.com",
+    "allowed": true,
+    "normalized": "https://example.com"
+  }
+]
